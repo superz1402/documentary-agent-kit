@@ -1,0 +1,37 @@
+{
+  "slug": "ahyeon",
+  "request": "build a documentary on ahyeon",
+  "created": "2026-10-10",
+  "mode": "fully-automatic",
+  "deliverable": {
+    "type": "youtube-documentary",
+    "duration_target_s": 1740,
+    "duration_tolerance_pct": 3,
+    "resolution": "1920x1080",
+    "fps": 25,
+    "language": "en",
+    "loudness_lufs": -14
+  },
+  "subject": {
+    "name": "Jung Ahyeon (정아현)",
+    "group": "BABYMONSTER",
+    "agency": "YG Entertainment",
+    "born": "2007-04-11",
+    "positions": "Main Vocalist, Lead Rapper, Lead Dancer, Center"
+  },
+  "title_working": "Jung Ahyeon — Worth the Wait",
+  "throughline": "The most-watched debut in K-pop history was missing someone. She had to wait for it — and then she owned it.",
+  "style": {
+    "palette": { "background": "#0a0a0a", "accent": "#c9a84c", "text": "#f2f2f2" },
+    "fonts": { "display": "Instrument Serif", "body": "Inter" },
+    "motif": "butterfly",
+    "tone": "calm-authoritative receipts-driven (Cold Fusion) x K-pop-native energy (BPM Stories)"
+  },
+  "gates": {
+    "facts_gate": "narration uses only VERIFIED dossier facts; [UNVERIFIED] forbidden",
+    "license_gate": "every timeline asset has a recorded license",
+    "human_approval": false
+  },
+  "source_dossier": "examples/ahyeon-dossier.md",
+  "publish_targets": ["github-release", "storage.to-mirror"]
+}

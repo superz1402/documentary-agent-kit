@@ -1,0 +1,38 @@
+name: publish
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: "Artifact produced by a pipeline run (contains final.mp4)"
+        required: true
+      tag:
+        description: "Release tag"
+        required: true
+      asset_filename:
+        description: "Filename inside the artifact to attach"
+        required: false
+        default: "S7_render/final.mp4"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID=$(gh api "repos/${{ github.repository }}/actions/artifacts" \
+            -q ".artifacts[] | select(.name==\"${{ inputs.artifact_name }}\") | .id" | head -1)
+          gh api "repos/${{ github.repository }}/actions/artifacts/$RUN_ID/zip" > artifact.zip
+          unzip -q artifact.zip -d stageout
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.tag }}" \
+            "stageout/${{ inputs.asset_filename }}" \
+            --title "Documentary — ${{ inputs.tag }}" \
+            --notes "Uploaded by publish.yml from artifact ${{ inputs.artifact_name }}."

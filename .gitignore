@@ -1,0 +1,21 @@
+# secrets / env
+.env
+.secrets/
+*.token
+
+# heavy media & renders (git keeps only stage-contract JSON/MD + small voice files)
+production/media/
+production/*/segments/
+production/*/S7_render/final.mp4
+production/*/cache/
+*.wav
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# os
+.DS_Store
+Thumbs.db

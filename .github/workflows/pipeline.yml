@@ -1,0 +1,64 @@
+name: pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Stage to run"
+        required: true
+        default: s4-voice
+        type: choice
+        options: [s3-media, s4-voice, s7-render]
+      episode:
+        description: "Episode slug under production/"
+        required: false
+        default: ahyeon
+        type: string
+      publish_release:
+        description: "After s7-render, upload final.mp4 to a GitHub release"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  run-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: System deps
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Python deps
+        run: pip install -r requirements.txt
+      - name: Run stage
+        run: python scripts/run_stage.py ${{ inputs.stage }} production/${{ inputs.episode }}
+        env:
+          NIM_API_KEY: ${{ secrets.NIM_API_KEY }}
+      - name: Upload stage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.stage }}-${{ inputs.episode }}
+          path: production/${{ inputs.episode }}/
+          if-no-files-found: warn
+
+  release:
+    needs: run-stage
+    if: ${{ inputs.publish_release && inputs.stage == 's7-render' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: s7-render-${{ inputs.episode }}
+          path: stageout
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="ep-${{ inputs.episode }}-$(date +%Y%m%d-%H%M%S)"
+          gh release create "$TAG" stageout/S7_render/final.mp4 \
+            --title "Jung Ahyeon — Worth the Wait (1080p)" \
+            --notes "Automated production via documentary-agent-kit. Metadata + captions inside the repo under production/${{ inputs.episode }}."
