@@ -9,6 +9,9 @@ FAILS = []
 
 
 def check_json(path, required=()):
+    if not os.path.exists(path):
+        print(f"   {os.path.basename(path)}: absent (stage not run yet) — ok")
+        return None
     try:
         d = json.load(open(path))
     except Exception as e:  # noqa: BLE001
